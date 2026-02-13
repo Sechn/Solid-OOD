@@ -1,0 +1,176 @@
+classDiagram
+    %% State Pattern
+    class TicketState {
+        <<interface>>
+        +handle(Ticket) void
+        +getStateName() String
+    }
+    
+    class CreatedState {
+        +handle(Ticket) void
+        +getStateName() String
+    }
+    
+    class AssignedState {
+        +handle(Ticket) void
+        +getStateName() String
+    }
+    
+    class InProgressState {
+        +handle(Ticket) void
+        +getStateName() String
+    }
+    
+    class ResolvedState {
+        +handle(Ticket) void
+        +getStateName() String
+    }
+    
+    class ClosedState {
+        +handle(Ticket) void
+        +getStateName() String
+    }
+    
+    TicketState <|.. CreatedState
+    TicketState <|.. AssignedState
+    TicketState <|.. InProgressState
+    TicketState <|.. ResolvedState
+    TicketState <|.. ClosedState
+    
+    %% Strategy Pattern - Assignment
+    class AssignmentStrategy {
+        <<interface>>
+        +assign(Ticket) void
+    }
+    
+    class TechnicalAssignmentStrategy {
+        +assign(Ticket) void
+    }
+    
+    class GeneralAssignmentStrategy {
+        +assign(Ticket) void
+    }
+    
+    AssignmentStrategy <|.. TechnicalAssignmentStrategy
+    AssignmentStrategy <|.. GeneralAssignmentStrategy
+    
+    %% Strategy Pattern - Response
+    class ResponseStrategy {
+        <<interface>>
+        +sendResponse(Ticket, String) void
+    }
+    
+    class EmailResponseStrategy {
+        +sendResponse(Ticket, String) void
+    }
+    
+    class WebResponseStrategy {
+        +sendResponse(Ticket, String) void
+    }
+    
+    class SMSResponseStrategy {
+        +sendResponse(Ticket, String) void
+    }
+    
+    ResponseStrategy <|.. EmailResponseStrategy
+    ResponseStrategy <|.. WebResponseStrategy
+    ResponseStrategy <|.. SMSResponseStrategy
+    
+    %% Observer Pattern
+    class LogObserver {
+        <<interface>>
+        +log(String) void
+    }
+    
+    class ConsoleLogger {
+        +log(String) void
+    }
+    
+    class FileLogger {
+        -filename String
+        +log(String) void
+    }
+    
+    class DatabaseLogger {
+        +log(String) void
+    }
+    
+    LogObserver <|.. ConsoleLogger
+    LogObserver <|.. FileLogger
+    LogObserver <|.. DatabaseLogger
+    
+    %% Singleton Pattern
+    class Logger {
+        <<singleton>>
+        -instance Logger$
+        -observers List~LogObserver~
+        -Logger()
+        +getInstance()$ Logger
+        +addObserver(LogObserver) void
+        +removeObserver(LogObserver) void
+        +log(String) void
+    }
+    
+    Logger o-- LogObserver
+    
+    %% Factory Pattern
+    class TicketFactory {
+        -ticketCounter int$
+        +createTicket(String, String)$ Ticket
+        +createWebTicket(String, String)$ Ticket
+        +createEmailTicket(String, String)$ Ticket
+        +createBugTicket(String, String)$ Ticket
+        +createFeatureRequest(String, String)$ Ticket
+    }
+    
+    %% Core Classes
+    class Ticket {
+        -id int
+        -state TicketState
+        -channel String
+        -type String
+        -request String
+        -response String
+        -assignedTeam String
+        +Ticket(int, String, String)
+        +handleCurrentState() void
+        +setState(TicketState) void
+        +getState() TicketState
+        +getStatus() String
+        +getId() int
+        +getChannel() String
+        +getType() String
+        +getRequest() String
+        +setRequest(String) void
+        +getResponse() String
+        +setResponse(String) void
+        +getAssignedTeam() String
+        +setAssignedTeam(String) void
+    }
+    
+    class TicketService {
+        -assignmentStrategy AssignmentStrategy
+        -responseStrategy ResponseStrategy
+        -logger Logger
+        +TicketService()
+        +handle(Ticket) void
+        +setAssignmentStrategy(AssignmentStrategy) void
+        +setResponseStrategy(ResponseStrategy) void
+        -selectAssignmentStrategy(Ticket) void
+        -selectResponseStrategy(Ticket) void
+        -generateResponse(Ticket) String
+    }
+    
+    class Main {
+        +main(String[])$ void
+    }
+    
+    %% Relationships
+    Ticket o-- TicketState
+    TicketService o-- AssignmentStrategy
+    TicketService o-- ResponseStrategy
+    TicketService o-- Logger
+    TicketFactory ..> Ticket : creates
+    Main ..> TicketFactory : uses
+    Main ..> TicketService : uses
+    Main ..> Logger : uses
